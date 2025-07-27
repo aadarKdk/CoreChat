@@ -46,6 +46,7 @@ The goal is to create a robust, secure, and feature-rich messaging platform, sta
 **Goal**: Establish project scaffolding and ensure a working development environment.
 
 - [x]   Initialize project, Git/GitHub, `npm`, `.gitignore`, Folders
+
 **Backend**
 - [ ]   Setup Express server
 - [ ]   MongoDB connection with Mongoose
