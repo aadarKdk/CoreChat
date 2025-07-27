@@ -166,9 +166,40 @@ The goal is to create a robust, secure, and feature-rich messaging platform, sta
 | Compass     | MongoDB inspection     |
 | Jest        | Unit testing (backend) |
 | Supertest   | API integration tests  |
+---
+---
+## Getting Started (Local Setup and run)
+```bash
+git clone https://github.com/aadarKdk/CoreChat.git
+cd CoreChat
 
+# Create a `.env` file and configure environment variables
+code .env
+
+# Open backend & install backend dependencies
+cd backend
+npm install
+
+# Start backend server
+npm run dev
+
+# In new terminal: Open frontend & install frontend dependencies
+cd ../frontend
+npm install
+
+# Start frontend
+npm run dev
+```
 ---
 
-## Getting Started (Local Setup)
+---
 ## Future Enhancements
+- [ ]   End-to-End encryption
+- [ ]   QR Code-based user sharing
+- [ ]   WebRTC video/audio calls
+- [ ]   AI-powered user recommendations
+---
+
+---
 ## Deployment Plan
+---
