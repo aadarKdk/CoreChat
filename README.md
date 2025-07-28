@@ -1,4 +1,3 @@
----
 # 💬 CoreChat
 **CoreChat** is a full-stack, real-time chat application built with the **MERN** stack (MongoDB, Express.js, React/Next.js, Node.js). This is a solo-project designed to explore and learn frontend/backend(full-stack)systems, authentication, WebSocket communication, secure REST APIs, and overall a full-stack product development.
 
