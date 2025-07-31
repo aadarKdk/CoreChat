@@ -35,13 +35,13 @@ The goal is to create a robust, secure, and feature-rich messaging platform, sta
 ### CoreChat v1.0.0 – MVP (Minimum Viable Product)
 
 * [x]   Setup project repository and structure (backend + frontend)
-* [ ]   Implement MongoDB database connection
+* [x]   Implement MongoDB database connection
 * [ ]   Setup user authentication (JWT + bcrypt)
 * [ ]   Develop User, Chat, and Message models
 * [ ]   Create RESTful routes for user, chat, and message
 * [ ]   Add basic error handling and status codes
 * [ ]   Integrate real-time chat with Socket.IO (basic)
-* [ ]   Simple, clean frontend with login/register and chat UI
+* [x]   Simple, clean frontend with login/register and chat UI
 
 ---
 
