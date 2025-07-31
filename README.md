@@ -41,7 +41,7 @@ The goal is to create a robust, secure, and feature-rich messaging platform, sta
 * [ ]   Create RESTful routes for user, chat, and message
 * [ ]   Add basic error handling and status codes
 * [ ]   Integrate real-time chat with Socket.IO (basic)
-* [x]   Simple, clean frontend with login/register and chat UI
+* [ ]   Simple, clean frontend with login/register and chat UI
 
 ---
 
