@@ -1,3 +1,4 @@
+// CoreChat/frontend/src/app/register/page.tsx
 'use client'
 
 import Link from "next/link";
