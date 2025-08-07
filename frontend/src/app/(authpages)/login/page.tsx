@@ -35,7 +35,7 @@ export default function LoginPage() {
   const router = useRouter();
   const handleSubmit = async (values) => {
     try {
-      const { data } = await axios.post("http://localhost:8080/api/login", values);
+      const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/login`, values);
       console.log(data);
       if (data.isLoggedIn) {
         router.push("/");

@@ -45,7 +45,7 @@ export default function RegisterPage() {
       setMessage('');
       setMessageType('');
       try {
-        const response = await axios.post("http://localhost:8080/api/register", values);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/register`, values);
         setMessage('Registration successful! You can now log in.');
         setMessageType('success');
         resetForm();
