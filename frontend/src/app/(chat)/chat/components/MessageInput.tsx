@@ -2,35 +2,35 @@
 
 'use client';
 
-import { useState } from 'react';
+// components/MessageInput.tsx
+import { useState } from "react";
+import { Send } from "lucide-react";
 
 export default function MessageInput() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleSend = () => {
     if (!message.trim()) return;
-    console.log('Sending:', message);
-    setMessage('');
+    console.log("Send message:", message);
+    setMessage("");
   };
 
-  const handleSubmit = async(values) => {
-    
-  }
-
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-center px-6 py-4 border-t border-gray-700 bg-slate-900/80 backdrop-blur-sm">
       <input
         type="text"
+        placeholder="Type a message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message..."
-        className="flex-1 border rounded px-4 py-2 focus:outline-none"
+        className="flex-1 rounded-l-md bg-gray-800 text-white px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onKeyDown={(e) => e.key === "Enter" && handleSend()}
       />
       <button
         onClick={handleSend}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-r-md hover:from-blue-700 hover:to-indigo-800 transition-colors"
+        aria-label="Send message"
       >
-        Send
+        <Send className="w-5 h-5 text-white" />
       </button>
     </div>
   );
