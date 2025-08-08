@@ -1,3 +1,5 @@
+//CoreChat/frontend/src/app/(authpages)/register/page.tsx
+
 'use client'
 
 import Link from "next/link";

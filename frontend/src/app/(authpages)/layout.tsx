@@ -1,4 +1,4 @@
-//CoreChat/fronend/src/app/(authpages)/register/page.tsx
+//CoreChat/fronend/src/app/(authpages)/layout.tsx
 
 import Link from "next/link"; 
 import { MessageCircle } from "lucide-react"; 
