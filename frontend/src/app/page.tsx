@@ -75,6 +75,7 @@ export default function HomePage() {
               Chat, share, and connect with advanced features designed for modern communication.
             </p>
             
+            <Link href= "/login">
             <Button 
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg px-8 py-6"
@@ -82,7 +83,7 @@ export default function HomePage() {
               Start Chatting Now
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            
+            </Link>
             {/* Social Proof */}
             <div className="flex items-center space-x-8 pt-4">
               <div className="flex items-center space-x-3">
@@ -165,7 +166,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">Audio Calling</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Make crystal-clear voice calls with HD audio quality for seamless communication anywhere, anytime.
+                  Make crystal-clear voice calls with clear audio quality for seamless communication anywhere, anytime.
                 </p>
               </CardContent>
             </Card>
