@@ -1,59 +1,131 @@
-// src/app/chat/components/ChatWindow.tsx
-'use client';
+// CoreChat/frontend/src/app/(chat)/chat/components/ChatWindow.tsx
 
-import React, { useEffect, useRef } from "react";
+"use client"
+
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { ChatHeader } from "@/app/(chat)/chat/components/ChatHeader";
+import { MessageInput } from "@/app/(chat)/chat/components/MessageInput";
+import { MessageBubble } from "@/components/message-bubble";
+import { ChatInfoPanel } from "@/app/(chat)/chat/components/ChatInfoPanel";
+import { cn } from "@/lib/utils";
+
+interface User {
+  id: string
+  name: string
+  avatar: string
+  status?: "online" | "offline"
+  lastSeen?: string
+}
 
 interface Message {
-  _id: string;
-  senderId: string;
-  text: string;
-  createdAt: string;
+  id: string
+  senderId: string
+  content: string
+  timestamp: string
+}
+
+interface Chat {
+  id: string
+  type: "dm" | "group"
+  participantIds: string[]
+  name: string
+  avatar: string
+  lastMessage: string
+  timestamp: string
+  unreadCount: number
+  isUnread: boolean
+  messages: Message[]
 }
 
 interface ChatWindowProps {
-  messages?: Message[];  // optional, can be undefined
-  currentUserId: string;
+  chat: Chat
+  currentUser: User
+  users: User[]
+  infoPanelWidth: {
+    width: number
+    handleMouseDown: (e: React.MouseEvent) => void
+    isResizing: boolean
+  }
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages = [], currentUserId }) => {
-  const chatEndRef = useRef<HTMLDivElement>(null);
+export function ChatWindow({ chat, currentUser, users, infoPanelWidth }: ChatWindowProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(true)
 
-  // Scroll to bottom when messages update
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    scrollToBottom()
+  }, [chat.messages, isInfoPanelOpen])
+
+  const getSenderDetails = (senderId: string) => {
+    if (senderId === currentUser.id) {
+      return currentUser
+    }
+    return (
+      users.find((user) => user.id === senderId) || {
+        id: senderId,
+        name: "Unknown",
+        avatar: "/placeholder.svg",
+        status: "offline" as const,
+        lastSeen: "Unknown",
+      }
+    )
+  }
+
+  const chatParticipant = users.find((user) => user.id === chat.participantIds[0])
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto bg-gray-400 p-4">
-      {messages.map((message) => {
-        const isSender = message.senderId === currentUserId;
+    <div className="flex flex-1">
+      {/* Main Chat Area */}
+      <div className={cn("flex flex-col flex-1 bg-slate-900", isInfoPanelOpen ? "border-r border-slate-700" : "")}>
+        <ChatHeader
+          chatName={chat.name}
+          chatId={chat.id}
+          chatAvatar={chat.avatar}
+          chatType={chat.type}
+          participant={chatParticipant}
+          onToggleInfoPanel={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
+        />
 
-        return (
+        {/* Message Display Area */}
+        <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-900">
+          {chat.messages.map((message) => {
+            const sender = getSenderDetails(message.senderId)
+            return (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                isCurrentUser={message.senderId === currentUser.id}
+                senderAvatar={sender.avatar}
+              />
+            )
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Message Input */}
+        <MessageInput />
+      </div>
+
+      {/* Info Panel - Resizable */}
+      {isInfoPanelOpen && (
+        <div
+          className="bg-slate-800/50 backdrop-blur-sm flex flex-col relative"
+          style={{ width: `${infoPanelWidth.width}px` }}
+        >
+          <ChatInfoPanel chat={chat} users={users} />
+
+          {/* Resize Handle */}
           <div
-            key={message._id}
-            className={`flex mb-2 ${isSender ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`px-4 py-2 text-sm max-w-[70%] break-words shadow-md ${
-                isSender
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg rounded-br-none"
-                  : "bg-gray-800 text-gray-100 rounded-lg rounded-bl-none"
-              }`}
-            >
-              {message.text}
-              <div className="text-[10px] opacity-60 mt-1 text-right select-none">
-                {new Date(message.createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-      <div ref={chatEndRef} />
+            className="absolute top-0 left-0 w-1 h-full cursor-col-resize bg-transparent hover:bg-blue-500/50 transition-colors"
+            onMouseDown={infoPanelWidth.handleMouseDown}
+          />
+        </div>
+      )}
     </div>
-  );
-};
-
-export default ChatWindow;
+  )
+}

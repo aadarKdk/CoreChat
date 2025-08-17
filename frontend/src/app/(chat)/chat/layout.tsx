@@ -1,14 +1,13 @@
-// src/app/chat/layout.tsx
+// CoreChat/frontend/src/app/(chat)/chat/layout.tsx
+import type { PropsWithChildren } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-import Sidebar from "./components/Sidebar";
-
-export default function ChatLayout({ children }: { children: React.ReactNode }) {
+export default function ChatLayout({ children }: PropsWithChildren) {
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-500 via-slate-600 to-gray-700 text-white">
-      <Sidebar />
-      <main className="flex-1 flex flex-col">
+    <SidebarProvider defaultOpen>
+      <div className="flex h-screen w-full">
         {children}
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }
