@@ -8,14 +8,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
 import { useResizable } from "@/app/(chat)/chat/hooks/useResizable";
 
 /* ------------------------------ Types ------------------------------ */
 interface User {
   id: string;
   name: string;
-  avatar: string;
+  profile: string;
   status: "online" | "offline";
   lastSeen: string;
 }
@@ -43,9 +42,9 @@ interface Chat {
 /* ------------------------------ Mock Data ------------------------------ */
 // Ideally, move to `data/mockChats.ts` for cleanliness
 const MOCK_USERS: User[] = [
-  { id: "user1", name: "Jonas Kahnwald", avatar: "/placeholder.svg?height=40&width=40&text=JK", status: "online", lastSeen: "Active now" },
-  { id: "user2", name: "Charlotte Doppler", avatar: "/placeholder.svg?height=40&width=40&text=CD", status: "online", lastSeen: "Active now" },
-  { id: "user3", name: "Mikkel Nielsen", avatar: "/placeholder.svg?height=40&width=40&text=MN", status: "offline", lastSeen: "Last seen 2 hours ago" },
+  { id: "user1", name: "Jonas Kahnwald", profile: "/placeholder.svg?height=40&width=40&text=JK", status: "online", lastSeen: "Active now" },
+  { id: "user2", name: "Charlotte Doppler", profile: "/placeholder.svg?height=40&width=40&text=CD", status: "online", lastSeen: "Active now" },
+  { id: "user3", name: "Mikkel Nielsen", profile: "/placeholder.svg?height=40&width=40&text=MN", status: "offline", lastSeen: "Last seen 2 hours ago" },
 ];
 
 // Example mock chats (shortened for brevity)
@@ -91,8 +90,13 @@ const MOCK_CHATS: Chat[] = [
   },
 ];
 
+// Shall we explore how to convert the mock data to real API data?
+
+
 /* ------------------------------ Main Page ------------------------------ */
+
 export default function ChatDashboardPage() {
+
   const [selectedChatId, setSelectedChatId] = useState<string | null>(MOCK_CHATS[0]?.id ?? null);
 
   const selectedChat = useMemo(
@@ -107,19 +111,12 @@ export default function ChatDashboardPage() {
   const readChats = useMemo(() => MOCK_CHATS.filter((chat) => !chat.isUnread), []);
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white">
+    <div className="flex min-h-screen w-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white">
       {/* Left Sidebar */}
       <ChatSidebar />
 
       {/* Main Content Area */}
       <SidebarInset className="flex flex-1">
-        {/* Header */}
-        <header className="flex h-16 items-center gap-2 border-b border-slate-700 px-4 bg-slate-800/50 backdrop-blur-sm">
-          <SidebarTrigger className="-ml-1 text-white hover:bg-slate-700" aria-label="Toggle Sidebar" />
-          <Separator orientation="vertical" className="mr-2 h-4 bg-slate-600" />
-          <h1 className="text-xl font-semibold text-white">Chats</h1>
-        </header>
-
         <div className="flex flex-1 bg-slate-900">
           {/* Middle Chat List Panel */}
           <div

@@ -1,4 +1,5 @@
 // CoreChat/frontend/src/app/(chat)/chat/layout.tsx
+
 import type { PropsWithChildren } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 

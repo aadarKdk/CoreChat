@@ -51,15 +51,13 @@ export function ChatInfoPanel({ chat, users }: ChatInfoPanelProps) {
     "/placeholder.svg?height=100&width=100&text=IMG2",
     "/placeholder.svg?height=100&width=100&text=IMG3",
     "/placeholder.svg?height=100&width=100&text=IMG4",
-    "/placeholder.svg?height=100&width=100&text=IMG5",
-    "/placeholder.svg?height=100&width=100&text=IMG6",
   ]
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
-        <h3 className="text-lg font-semibold text-white">Contact Info</h3>
+        <h3 className="text-lg font-semibold text-white text-center">Contact Info</h3>
       </div>
 
       {/* User Profile Section */}
