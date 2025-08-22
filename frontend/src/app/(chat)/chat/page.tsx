@@ -42,9 +42,9 @@ interface Chat {
 /* ------------------------------ Mock Data ------------------------------ */
 // Ideally, move to `data/mockChats.ts` for cleanliness
 const MOCK_USERS: User[] = [
-  { id: "user1", name: "Jonas Kahnwald", profile: "/placeholder.svg?height=40&width=40&text=JK", status: "online", lastSeen: "Active now" },
-  { id: "user2", name: "Charlotte Doppler", profile: "/placeholder.svg?height=40&width=40&text=CD", status: "online", lastSeen: "Active now" },
-  { id: "user3", name: "Mikkel Nielsen", profile: "/placeholder.svg?height=40&width=40&text=MN", status: "offline", lastSeen: "Last seen 2 hours ago" },
+  { id: "user1", name: "Ivy Kahnwald", profile: "/placeholder.svg?height=40&width=40&text=JK", status: "online", lastSeen: "Active now" },
+  { id: "user2", name: "Max Doppler", profile: "/placeholder.svg?height=40&width=40&text=CD", status: "online", lastSeen: "Active now" },
+  { id: "user3", name: "Zoe Nielsen", profile: "/placeholder.svg?height=40&width=40&text=MN", status: "offline", lastSeen: "Last seen 2 hours ago" },
 ];
 
 // Example mock chats (shortened for brevity)
@@ -53,7 +53,7 @@ const MOCK_CHATS: Chat[] = [
     id: "chat1",
     type: "dm",
     participantIds: ["user1"],
-    name: "Jonas Kahnwald",
+    name: "Ivy Kahnwald",
     avatar: "/placeholder.svg?height=40&width=40&text=JK",
     lastMessage: "Hey! How are you doing today?",
     timestamp: "8:40 PM",
@@ -68,7 +68,7 @@ const MOCK_CHATS: Chat[] = [
     id: "chat2",
     type: "dm",
     participantIds: ["user2"],
-    name: "Charlotte Doppler",
+    name: "Max Doppler",
     avatar: "/placeholder.svg?height=40&width=40&text=CD",
     lastMessage: "Thanks for your help with the project!",
     timestamp: "3:17 PM",
@@ -80,7 +80,7 @@ const MOCK_CHATS: Chat[] = [
     id: "chat3",
     type: "dm",
     participantIds: ["user3"],
-    name: "Mikkel Nielsen",
+    name: "Zoe Nielsen",
     avatar: "/placeholder.svg?height=40&width=40&text=MN",
     lastMessage: "See you tomorrow at the meeting",
     timestamp: "11:49 AM",
@@ -237,11 +237,13 @@ function ChatItem({ chat, users, isSelected, onClick }: ChatItemProps) {
         {/* Online/Offline Status Indicator */}
         <div
           className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-slate-800",
+            "absolute -bottom-1 -right-0 w-4 h-4 rounded-full border-4 border-slate-800",
             status === "online" ? "bg-green-500" : "bg-slate-500"
           )}
         />
       </div>
+
+       bottom-3 right-1 w-6 h-6 rounded-full border-4 border-slate-800
 
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center mb-1">

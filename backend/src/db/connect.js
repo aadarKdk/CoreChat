@@ -1,15 +1,14 @@
-//CoreChat/backend/src/db/connect.js
+// CoreChat/backend/src/db/connect.js
 
 import mongoose from "mongoose";
 
-async function connect(){
+async function connectDB(uri){
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/chatdb'); 
-        console.log("Connected to MongoDB.");
+        await mongoose.connect(uri);
+        console.log("Connected to MongoDB successfully!");
     } catch (err) {
-        console.error('Failed to connect to MongodB');
-        // process.exit(1);    // exit the app if DB fails.
+        console.error('Failed to connect to MongoDB:', err.message);
+        process.exit(1);
     }
 }
-
-export default connect;
+export default connectDB;
