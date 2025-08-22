@@ -10,44 +10,60 @@ import { MessageBubble } from "@/components/message-bubble";
 import { ChatInfoPanel } from "@/app/(chat)/chat/components/ChatInfoPanel";
 import { cn } from "@/lib/utils";
 
-interface User {
-  id: string
-  name: string
-  avatar: string
-  status?: "online" | "offline"
-  lastSeen?: string
+// Note: These IDs will be MongoDB's _id (string)
+interface BaseUser {
+  _id: string;
+  name: string;
+  username: string;
+  profilePicture: string;
+  status?: "online" | "offline" | "away" | "do_not_disturb";
+  lastSeen?: string; // This might be handled on backend or derived
+}
+
+interface User extends BaseUser {
+  // Add other user-specific fields if needed, like email, gender etc.
 }
 
 interface Message {
-  id: string
-  senderId: string
-  content: string
-  timestamp: string
+  _id: string;
+  sender: BaseUser; // Sender will be populated User object from backend
+  conversation: string; // Will be the conversation _id
+  content: string;
+  messageType: "text" | "image" | "file";
+  fileUrl?: string;
+  readBy: string[]; // Array of user _ids
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
-interface Chat {
-  id: string
-  type: "dm" | "group"
-  participantIds: string[]
-  name: string
-  avatar: string
-  lastMessage: string
-  timestamp: string
-  unreadCount: number
-  isUnread: boolean
-  messages: Message[]
+interface Conversation {
+  _id: string;
+  participants: BaseUser[]; // Participants will be populated User objects
+  type: "dm" | "group";
+  name?: string; // Optional for DMs
+  groupAdmin?: BaseUser; // Populated User object for group admin
+  avatar?: string; // For group chats
+  lastMessage?: Message; // Populated Message object
+  unreadCounts: { user: string; count: number }[]; // Track unread messages per user
+  createdAt: string;
+  updatedAt: string;
+  unreadCount: number; // Frontend specific, derived from unreadCounts
 }
 
 interface ChatWindowProps {
-  chat: Chat
-  currentUser: User
-  users: User[]
+  chat: Conversation; // Using Conversation interface
+  currentUser: User;
+  users: User[]; // All available users, primarily for getSenderDetails for now
   infoPanelWidth: {
-    width: number
-    handleMouseDown: (e: React.MouseEvent) => void
-    isResizing: boolean
-  }
+    width: number;
+    handleMouseDown: (e: React.MouseEvent) => void;
+    isResizing: boolean;
+  };
+  onSendMessage: (conversationId: string, content: string, messageType?: "text" | "image" | "file", fileUrl?: string) => Promise<void>;
+  messages: Message[]; // Explicitly pass messages as a separate prop - DEFINED HERE ONCE
 }
+
+
 
 export function ChatWindow({ chat, currentUser, users, infoPanelWidth }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)

@@ -1,8 +1,10 @@
+// CoreChat/frontend/src/app/(chat)/chat/page.tsx
+
 "use client";
 
 import { useState, useMemo } from "react";
 import { ChatSidebar } from "@/app/(chat)/chat/components/Sidebar";
-import { ChatWindow } from "@/app/(chat)/chat/components/ChatWindow";
+import { ChatWindow } from "@/app/(chat)/chat/components/chatWindow";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
