@@ -1,127 +1,112 @@
-//CoreChat/frontend/src/app/(authpages)/login/page.tsx
+// CoreChat/frontend/src/app/(authpages)/login/page.tsx
 
-'use client';
+"use client";
 
-import React from 'react';
-import { useFormik } from 'formik';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth"; // Import the useAuth hook
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react"; // For loading spinner
 
-const LoginPage = () => {
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // Destructure login function, loading state, error, and error clear from useAuth
+  const { login, isLoadingAuth, error, clearError } = useAuth();
   const router = useRouter();
-  const [message, setMessage] = React.useState('');
-  const [messageType, setMessageType] = React.useState<'success' | 'error'>('success');
+  const searchParams = useSearchParams();
+  const registered = searchParams.get('registered'); // Check if redirected from registration
 
-  const handleSubmit = async (
-    values: { email: string; password: string },
-    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
-  ) => {
-    try {
-      const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}login`, values);
-      if (data.isLoggedIn) {
-        setMessage('Login successful! Redirecting...');
-        setMessageType('success');
-        // Redirect to homepage after a short delay
-        setTimeout(() => router.push('/chat'), 1000);
-      } else {
-        setMessage('Invalid email or password.');
-        setMessageType('error');
-      }
-    } catch (error: any) {
-      // Handle various error scenarios from the API
-      setMessage(error?.response?.data?.message || 'Something went wrong. Please try again.');
-      setMessageType('error');
-    } finally {
-      setSubmitting(false); // Ensure submitting state is reset
+  // Clear any auth errors when component mounts or form inputs change
+  useEffect(() => {
+    clearError();
+  }, [email, password, clearError]);
+
+  // Handle form submission
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    const success = await login({ email, password }); // Call the login function from useAuth
+    if (success) {
+      // Redirection to '/chat' is handled automatically by the useAuth hook upon successful login
     }
   };
 
-  const formik = useFormik({
-    initialValues: { email: '', password: '' },
-    onSubmit: handleSubmit,
-  });
-
   return (
-    <div className="relative w-full">
-      <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-10 -z-10"></div>
-
-      <Card className="w-full max-w-md border-2 border-gray-100 dark:border-zinc-800 rounded-2xl shadow-xl bg-white">
+    <div>
+      <Card className="w-[380px] bg-slate-800 border-slate-700 shadow-xl rounded-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold select-none">Welcome Back</CardTitle>
-          <CardDescription>
-            Log in to access your account
+          <CardTitle className="text-3xl font-bold text-blue-400">Welcome Back</CardTitle>
+          <CardDescription className="text-slate-400">
+            Sign in to your account to continue chatting.
           </CardDescription>
         </CardHeader>
-
         <CardContent>
-          <form onSubmit={formik.handleSubmit} noValidate>
-            <div className="mt-4">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                {...formik.getFieldProps('email')}
-              />
+          {/* Display success message if redirected after registration */}
+          {registered && (
+            <div className="mb-4 p-3 bg-green-900/40 text-green-300 border border-green-700 rounded-md text-sm">
+              Registration successful! Please log in.
             </div>
-
-            <div className="mt-4">
-
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...formik.getFieldProps('password')}
-              />
+          )}
+          {/* Display authentication errors from useAuth */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-900/40 text-red-300 border border-red-700 rounded-md text-sm">
+              {error}
             </div>
-
-            {message && (
-              <div
-                className={`p-3 rounded-lg text-center mt-4 ${
-                  messageType === 'success'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                }`}
-              >
-                {message}
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="email" className="text-slate-300">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-slate-700/50 border-slate-600 focus:ring-blue-500 focus:border-blue-500 text-white placeholder:text-slate-400 rounded-md" // Added rounded-md for consistency
+                  required
+                />
               </div>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg transition"
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? 'Logging in...' : 'Log In'}
-            </Button>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="password" className="text-slate-300">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-slate-700/50 border-slate-600 focus:ring-blue-500 focus:border-blue-500 text-white placeholder:text-slate-400 rounded-md" // Added rounded-md for consistency
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 rounded-md transition-colors duration-300 mt-2 shadow-lg" // Added shadow-lg for consistency
+                disabled={isLoadingAuth} // Disable button when authentication is in progress
+              >
+                {isLoadingAuth ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </div>
           </form>
-        </CardContent>
-
-        <CardFooter className="flex-col">
-          <p className="mt-4 text-sm text-center text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              Register
+          <p className="mt-6 text-center text-sm text-slate-400">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-blue-400 hover:underline">
+              Sign Up
             </Link>
           </p>
-        </CardFooter>
+        </CardContent>
       </Card>
     </div>
   );
-};
-
-export default LoginPage;
+}

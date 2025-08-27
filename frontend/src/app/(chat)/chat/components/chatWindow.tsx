@@ -1,147 +1,171 @@
-// CoreChat/frontend/src/app/(chat)/chat/components/ChatWindow.tsx
+// CoreChat/frontend/src/app/(chat)/chat/components/chatWindow.tsx
 
-"use client"
+"use client";
 
-import type React from "react";
-import { useState, useRef, useEffect } from "react";
-import { ChatHeader } from "@/app/(chat)/chat/components/ChatHeader";
-import { MessageInput } from "@/app/(chat)/chat/components/MessageInput";
-import { MessageBubble } from "@/components/message-bubble";
-import { ChatInfoPanel } from "@/app/(chat)/chat/components/ChatInfoPanel";
+import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { User } from '@/types'; // Import User type
 
-// Note: These IDs will be MongoDB's _id (string)
-interface BaseUser {
-  _id: string;
-  name: string;
-  username: string;
-  profilePicture: string;
-  status?: "online" | "offline" | "away" | "do_not_disturb";
-  lastSeen?: string; // This might be handled on backend or derived
+// Placeholder for a Chat type, you will define this later
+// This helps prevent TypeScript errors for now
+interface Chat {
+    messages: any[];
+    participants: User[];
 }
 
-interface User extends BaseUser {
-  // Add other user-specific fields if needed, like email, gender etc.
-}
+export function ChatWindow() {
+    const { currentUser, isLoadingAuth } = useAuth();
+    // Use a state for the chat object, initialized to null or undefined
+    const [chat, setChat] = useState<Chat | undefined>(undefined);
+    const [inputMessage, setInputMessage] = useState<string>('');
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-interface Message {
-  _id: string;
-  sender: BaseUser; // Sender will be populated User object from backend
-  conversation: string; // Will be the conversation _id
-  content: string;
-  messageType: "text" | "image" | "file";
-  fileUrl?: string;
-  readBy: string[]; // Array of user _ids
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
-}
+    // Placeholder data for initial render, replace with real data fetching later
+    useEffect(() => {
+        // Simulate a data fetch
+        const fetchChatData = () => {
+            if (!currentUser) return;
 
-interface Conversation {
-  _id: string;
-  participants: BaseUser[]; // Participants will be populated User objects
-  type: "dm" | "group";
-  name?: string; // Optional for DMs
-  groupAdmin?: BaseUser; // Populated User object for group admin
-  avatar?: string; // For group chats
-  lastMessage?: Message; // Populated Message object
-  unreadCounts: { user: string; count: number }[]; // Track unread messages per user
-  createdAt: string;
-  updatedAt: string;
-  unreadCount: number; // Frontend specific, derived from unreadCounts
-}
+            setChat({
+                messages: [
+                    { id: "1", senderId: "ai-id", content: "Hello! Welcome to CoreChat. How can I help you?", timestamp: new Date(), type: "text" },
+                    { id: "2", senderId: currentUser.id, content: "Hi, I'm just testing the chat.", timestamp: new Date(), type: "text" },
+                ],
+                participants: [
+                    { id: currentUser.id, name: currentUser.name, username: currentUser.username, email: currentUser.email, gender: currentUser.gender, profilePicture: currentUser.profilePicture },
+                    { id: "ai-id", name: "AI Assistant", username: "corechat-ai", email: "ai@corechat.com", gender: "other", profilePicture: "https://placehold.co/400x400/2f3a47/ffffff?text=AI" },
+                ]
+            });
+        };
 
-interface ChatWindowProps {
-  chat: Conversation; // Using Conversation interface
-  currentUser: User;
-  users: User[]; // All available users, primarily for getSenderDetails for now
-  infoPanelWidth: {
-    width: number;
-    handleMouseDown: (e: React.MouseEvent) => void;
-    isResizing: boolean;
-  };
-  onSendMessage: (conversationId: string, content: string, messageType?: "text" | "image" | "file", fileUrl?: string) => Promise<void>;
-  messages: Message[]; // Explicitly pass messages as a separate prop - DEFINED HERE ONCE
-}
+        if (currentUser) {
+            fetchChatData();
+        }
+    }, [currentUser]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (chat && chat.messages) {
+            scrollToBottom();
+        }
+    }, [chat]);
+
+    const getSenderDetails = (senderId: string) => {
+        return chat?.participants.find(p => p.id === senderId);
+    };
+
+    const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (inputMessage.trim() === '' || !currentUser || !chat) {
+            return;
+        }
+
+        const newMessage = {
+            id: Date.now().toString(),
+            senderId: currentUser.id,
+            content: inputMessage,
+            timestamp: new Date(),
+            type: "text"
+        };
+
+        // Simulate sending a message by adding it to the chat state
+        setChat({
+            ...chat,
+            messages: [...chat.messages, newMessage]
+        });
+
+        setInputMessage(''); // Clear the input field
+    };
 
 
-
-export function ChatWindow({ chat, currentUser, users, infoPanelWidth }: ChatWindowProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(true)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [chat.messages, isInfoPanelOpen])
-
-  const getSenderDetails = (senderId: string) => {
-    if (senderId === currentUser.id) {
-      return currentUser
+    // Show a loading spinner if authentication is still in progress or no user is found
+    if (isLoadingAuth || !currentUser || !chat) {
+        return (
+            <div className="flex-1 flex flex-col justify-center items-center bg-slate-800">
+                <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+                <p className="ml-3 mt-4 text-lg text-slate-400">Loading chat...</p>
+            </div>
+        );
     }
+
     return (
-      users.find((user) => user.id === senderId) || {
-        id: senderId,
-        name: "Unknown",
-        avatar: "/placeholder.svg",
-        status: "offline" as const,
-        lastSeen: "Unknown",
-      }
-    )
-  }
+        <div className="flex-1 flex flex-col h-full bg-slate-800">
+            {/* Header */}
+            <div className="flex items-center p-4 border-b border-slate-700 bg-slate-900">
+                <h2 className="text-xl font-semibold text-white">CoreChat AI Assistant</h2>
+            </div>
 
-  const chatParticipant = users.find((user) => user.id === chat.participantIds[0])
+            {/* Message List Container */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+                {chat.messages.map((message) => {
+                    const sender = getSenderDetails(message.senderId);
+                    const isCurrentUser = message.senderId === currentUser.id;
 
-  return (
-    <div className="flex flex-1">
-      {/* Main Chat Area */}
-      <div className={cn("flex flex-col flex-1 bg-slate-900", isInfoPanelOpen ? "border-r border-slate-700" : "")}>
-        <ChatHeader
-          chatName={chat.name}
-          chatId={chat.id}
-          chatAvatar={chat.avatar}
-          chatType={chat.type}
-          participant={chatParticipant}
-          onToggleInfoPanel={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
-        />
+                    return (
+                        <div
+                            key={message.id}
+                            className={cn(
+                                "flex items-start gap-4",
+                                isCurrentUser ? "justify-end" : "justify-start"
+                            )}
+                        >
+                            {!isCurrentUser && (
+                                <div className="flex-shrink-0">
+                                    <img
+                                        src={sender?.profilePicture}
+                                        alt={sender?.name}
+                                        className="h-8 w-8 rounded-full"
+                                    />
+                                </div>
+                            )}
+                            <div
+                                className={cn(
+                                    "p-3 rounded-lg max-w-sm",
+                                    isCurrentUser
+                                        ? "bg-blue-600 text-white rounded-br-none"
+                                        : "bg-slate-700 text-slate-200 rounded-bl-none"
+                                )}
+                            >
+                                <p>{message.content}</p>
+                            </div>
+                            {isCurrentUser && (
+                                <div className="flex-shrink-0">
+                                    <img
+                                        src={sender?.profilePicture}
+                                        alt={sender?.name}
+                                        className="h-8 w-8 rounded-full"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+                <div ref={messagesEndRef} />
+            </div>
 
-        {/* Message Display Area */}
-        <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-900">
-          {chat.messages.map((message) => {
-            const sender = getSenderDetails(message.senderId)
-            return (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isCurrentUser={message.senderId === currentUser.id}
-                senderAvatar={sender.avatar}
-              />
-            )
-          })}
-          <div ref={messagesEndRef} />
+            {/* Message Input Form */}
+            <div className="p-4 border-t border-slate-700 bg-slate-900">
+                <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <input
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        className="flex-1 px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    />
+                    <button
+                        type="submit"
+                        className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        <Send size={20} />
+                    </button>
+                </form>
+            </div>
         </div>
-
-        {/* Message Input */}
-        <MessageInput />
-      </div>
-
-      {/* Info Panel - Resizable */}
-      {isInfoPanelOpen && (
-        <div
-          className="bg-slate-800/50 backdrop-blur-sm flex flex-col relative"
-          style={{ width: `${infoPanelWidth.width}px` }}
-        >
-          <ChatInfoPanel chat={chat} users={users} />
-
-          {/* Resize Handle */}
-          <div
-            className="absolute top-0 left-0 w-1 h-full cursor-col-resize bg-transparent hover:bg-blue-500/50 transition-colors"
-            onMouseDown={infoPanelWidth.handleMouseDown}
-          />
-        </div>
-      )}
-    </div>
-  )
+    );
 }

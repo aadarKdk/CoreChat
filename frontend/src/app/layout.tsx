@@ -1,8 +1,11 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+// CoreChat/frontend/src/app/layout.tsx
 
-const inter = Inter({ subsets: ["latin"] })
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css"
+import { AuthProvider } from "@/hooks/useAuth";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CoreChat - A Real-time Chat Application",
@@ -11,14 +14,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>){
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-background text-foreground`}>
-        {children}
+      <body className={inter.className}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
-  )
+  );
 }
+
+
+
+
