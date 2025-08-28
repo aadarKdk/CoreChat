@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Shield, Share, Star, ArrowRight, Phone, Lock, Zap } from 'lucide-react';
+import { MessageCircle, Shield, Star, ArrowRight, Phone, Zap } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -35,7 +35,7 @@ export default function HomePage() {
           </div>
           <span className="text-xl font-bold text-white">CoreChat</span>
         </div>
-        
+
         <div className="hidden md:flex items-center space-x-8">
           <Link href="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
           <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About</Link>
@@ -43,7 +43,7 @@ export default function HomePage() {
           <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
           <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <Link href="/login">
             <Button variant="outline" className="border-gray-400 text-gray-100 hover:bg-gray-600 hover:text-white hover:border-gray-300 bg-transparent">
@@ -69,20 +69,20 @@ export default function HomePage() {
                 with everyone
               </span>
             </h1>
-            
+
             <p className="text-xl text-gray-300 leading-relaxed">
-              Experience seamless, secure messaging that brings people together effortlessly. 
+              Experience seamless, secure messaging that brings people together effortlessly.
               Chat, share, and connect with advanced features designed for modern communication.
             </p>
-            
-            <Link href= "/login">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg px-8 py-6"
-            >
-              Start Chatting Now
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg px-8 py-6"
+              >
+                Start Chatting Now
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </Link>
             {/* Social Proof */}
             <div className="flex items-center space-x-8 pt-4">
@@ -103,7 +103,7 @@ export default function HomePage() {
                   <div className="text-sm text-gray-400">Happy Users</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-1">
                   {[...Array(5)].map((_, i) => (
@@ -117,7 +117,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          
+
           {/* Phone Mockups */}
           <div className="relative">
             <div className="relative z-10">
@@ -156,7 +156,7 @@ export default function HomePage() {
               Everything you need for seamless communication
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300">
               <CardContent className="p-8">
@@ -170,7 +170,7 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300">
               <CardContent className="p-8">
                 {/* Keep Safe & Private icon */}
@@ -183,7 +183,7 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300">
               <CardContent className="p-8">
                 {/* Lightning Fast Sharing icon */}
@@ -194,7 +194,7 @@ export default function HomePage() {
                 <p className="text-gray-300 leading-relaxed">
                   Share documents, photos, and videos instantly with lightning-fast file sharing capabilities.
                 </p>
-               </CardContent>
+              </CardContent>
             </Card>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function HomePage() {
             <div className="text-gray-400 text-sm">
               © CoreChat 2025. All rights reserved.
             </div>
-            
+
             <div className="flex flex-wrap items-center space-x-6 text-sm">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Privacy Policy

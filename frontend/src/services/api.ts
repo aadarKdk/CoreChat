@@ -5,7 +5,7 @@ interface RequestOptions extends RequestInit {
     token?: string; // Optional token if it's not the default one
 }
 
-const BASE_URL = process.env.EXPRESS_BACKEND_URL || 'http://localhost:8080';
+const BASE_URL = process.env.NEXT_PUBLIC_EXPRESS_BACKEND_URL || 'http://localhost:8080';
 
 
 export async function apiClient<T>(

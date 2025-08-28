@@ -1,14 +1,21 @@
 // CoreChat/frontend/src/app/(chat)/chat/layout.tsx
 
 import type { PropsWithChildren } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AuthProvider } from "@/hooks/useAuth";
+//import { ChatProvider } from "@/hooks/useChat"; // Import the new ChatProvider
+import { ChatSidebar } from "./components/sidebar";
+import { ChatWindow } from "./components/chatWindow";
+import { ChatProvider } from "@/hooks/useChat";
 
 export default function ChatLayout({ children }: PropsWithChildren) {
   return (
-    <SidebarProvider defaultOpen>
-      <div className="flex h-screen w-full">
-        {children}
-      </div>
-    </SidebarProvider>
+    <AuthProvider>
+      <ChatProvider>
+        <div className="flex h-screen w-full">
+            {children}
+        </div>
+      </ChatProvider>
+    </AuthProvider>
   );
 }
+

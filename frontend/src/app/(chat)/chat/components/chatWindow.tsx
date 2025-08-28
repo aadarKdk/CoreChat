@@ -2,89 +2,57 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User } from '@/types'; // Import User type
-
-// Placeholder for a Chat type, you will define this later
-// This helps prevent TypeScript errors for now
-interface Chat {
-    messages: any[];
-    participants: User[];
-}
+import { useChat } from '@/hooks/useChat';
+import * as messageService from '@/services/messageService';
+import { Conversation, Message } from '@/types';
 
 export function ChatWindow() {
-    const { currentUser, isLoadingAuth } = useAuth();
-    // Use a state for the chat object, initialized to null or undefined
-    const [chat, setChat] = useState<Chat | undefined>(undefined);
-    const [inputMessage, setInputMessage] = useState<string>('');
+    const { currentUser, token } = useAuth();
+    const { activeConversation, messages, isLoadingChat, addMessage, setActiveConversationId } = useChat();
+    const [inputMessage, setInputMessage] = React.useState<string>('');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    // Placeholder data for initial render, replace with real data fetching later
+    // Auto-scroll to the bottom of the message list
     useEffect(() => {
-        // Simulate a data fetch
-        const fetchChatData = () => {
-            if (!currentUser) return;
-
-            setChat({
-                messages: [
-                    { id: "1", senderId: "ai-id", content: "Hello! Welcome to CoreChat. How can I help you?", timestamp: new Date(), type: "text" },
-                    { id: "2", senderId: currentUser.id, content: "Hi, I'm just testing the chat.", timestamp: new Date(), type: "text" },
-                ],
-                participants: [
-                    { id: currentUser.id, name: currentUser.name, username: currentUser.username, email: currentUser.email, gender: currentUser.gender, profilePicture: currentUser.profilePicture },
-                    { id: "ai-id", name: "AI Assistant", username: "corechat-ai", email: "ai@corechat.com", gender: "other", profilePicture: "https://placehold.co/400x400/2f3a47/ffffff?text=AI" },
-                ]
-            });
-        };
-
-        if (currentUser) {
-            fetchChatData();
-        }
-    }, [currentUser]);
-
-    const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    }, [messages]);
 
-    useEffect(() => {
-        if (chat && chat.messages) {
-            scrollToBottom();
-        }
-    }, [chat]);
-
-    const getSenderDetails = (senderId: string) => {
-        return chat?.participants.find(p => p.id === senderId);
-    };
-
-    const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+    // Handle sending a new message
+    const handleSendMessage = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (inputMessage.trim() === '' || !currentUser || !chat) {
+        if (inputMessage.trim() === '' || !currentUser || !activeConversation || !token) {
             return;
         }
 
-        const newMessage = {
-            id: Date.now().toString(),
-            senderId: currentUser.id,
-            content: inputMessage,
-            timestamp: new Date(),
-            type: "text"
-        };
+        try {
+            const payload = {
+                content: inputMessage,
+                conversationId: activeConversation._id,
+                senderId: currentUser._id,
+            };
 
-        // Simulate sending a message by adding it to the chat state
-        setChat({
-            ...chat,
-            messages: [...chat.messages, newMessage]
-        });
+            const newMessage = await messageService.sendMessage(payload, token);
+            addMessage(newMessage); // Use the context function to add the new message
+            setInputMessage('');
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        }
+    }, [inputMessage, currentUser, activeConversation, token, addMessage]);
 
-        setInputMessage(''); // Clear the input field
+    // Determine the chat title based on the conversation type
+    const getChatTitle = (convo: Conversation, user: any) => {
+      if (convo.groupAdmin) {
+        return convo.name;
+      }
+      const otherParticipant = convo.participants.find(p => p._id !== user._id);
+      return otherParticipant?.name || "Private Chat";
     };
 
-
-    // Show a loading spinner if authentication is still in progress or no user is found
-    if (isLoadingAuth || !currentUser || !chat) {
+    if (isLoadingChat || !currentUser) {
         return (
             <div className="flex-1 flex flex-col justify-center items-center bg-slate-800">
                 <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
@@ -93,32 +61,42 @@ export function ChatWindow() {
         );
     }
 
+    if (!activeConversation) {
+        return (
+            <div className="flex-1 flex flex-col justify-center items-center bg-slate-800 text-slate-400">
+                <p>No active conversations found. Start a new chat!</p>
+            </div>
+        );
+    }
+
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-800">
             {/* Header */}
             <div className="flex items-center p-4 border-b border-slate-700 bg-slate-900">
-                <h2 className="text-xl font-semibold text-white">CoreChat AI Assistant</h2>
+                <h2 className="text-xl font-semibold text-white">
+                    {getChatTitle(activeConversation, currentUser)}
+                </h2>
             </div>
 
             {/* Message List Container */}
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
-                {chat.messages.map((message) => {
-                    const sender = getSenderDetails(message.senderId);
-                    const isCurrentUser = message.senderId === currentUser.id;
+                {messages.map((message) => {
+                    const sender = activeConversation.participants.find(p => p._id === message.sender._id);
+                    const isCurrentUser = message.sender._id === currentUser._id;
 
                     return (
                         <div
-                            key={message.id}
+                            key={message._id}
                             className={cn(
-                                "flex items-start gap-4",
+                                "flex items-end gap-2", // Changed from items-start gap-4
                                 isCurrentUser ? "justify-end" : "justify-start"
                             )}
                         >
                             {!isCurrentUser && (
                                 <div className="flex-shrink-0">
                                     <img
-                                        src={sender?.profilePicture}
-                                        alt={sender?.name}
+                                        src={sender?.profilePicture || "https://placehold.co/400x400/2f3a47/ffffff?text=U"}
+                                        alt={sender?.name || "User"}
                                         className="h-8 w-8 rounded-full"
                                     />
                                 </div>
@@ -136,8 +114,8 @@ export function ChatWindow() {
                             {isCurrentUser && (
                                 <div className="flex-shrink-0">
                                     <img
-                                        src={sender?.profilePicture}
-                                        alt={sender?.name}
+                                        src={currentUser.profilePicture}
+                                        alt={currentUser.username}
                                         className="h-8 w-8 rounded-full"
                                     />
                                 </div>
@@ -161,6 +139,7 @@ export function ChatWindow() {
                     <button
                         type="submit"
                         className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        disabled={!activeConversation}
                     >
                         <Send size={20} />
                     </button>

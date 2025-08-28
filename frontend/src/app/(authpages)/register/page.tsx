@@ -119,9 +119,9 @@ export default function RegisterPage() {
                     <SelectValue placeholder="Select your gender" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 text-white border border-slate-700">
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Others</SelectItem>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Others">Others</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
