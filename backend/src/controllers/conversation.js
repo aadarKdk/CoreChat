@@ -1,8 +1,7 @@
 // CoreChat/backend/src/controllers/conversation.js
 
 import Conversation from "../models/conversation.js";
-import User from "../models/user.js"; 
-
+import User from "../models/user.js";
 
 const createConversation = async (req, res) => {
     try {
@@ -17,7 +16,12 @@ const createConversation = async (req, res) => {
             participants.push(currentUserId.toString());
         }
 
+        // --- DEBUG LOGS START ---
+        console.log("createConversation - Participants array received:", participants);
         const existingUsers = await User.find({ _id: { $in: participants } });
+        console.log("createConversation - Existing users found in DB (IDs):", existingUsers.map(u => u._id.toString()));
+        // --- DEBUG LOGS END ---
+
         if (existingUsers.length !== participants.length) {
             return res.status(400).json({ message: "One or more participants are invalid." });
         }
@@ -38,7 +42,7 @@ const createConversation = async (req, res) => {
             if (!name) {
                 return res.status(400).json({ message: "Group name is required for group chats." });
             }
-            if (participants.length < 2) { 
+            if (participants.length < 2) {
                 return res.status(400).json({ message: "Group chat must have at least two participants." });
             }
         } else {
@@ -50,8 +54,8 @@ const createConversation = async (req, res) => {
         const newConversation = await Conversation.create({
             participants,
             type,
-            name: type === 'group' ? name : undefined, 
-            groupAdmin: type === 'group' ? currentUserId : undefined, 
+            name: type === 'group' ? name : undefined,
+            groupAdmin: type === 'group' ? currentUserId : undefined,
             unreadCounts,
         });
 
@@ -66,8 +70,6 @@ const createConversation = async (req, res) => {
         res.status(500).json({ message: "Failed to create conversation." });
     }
 };
-
-
 
 const getUserConversations = async (req, res) => {
     try {
@@ -92,8 +94,6 @@ const getUserConversations = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch conversations." });
     }
 };
-
-
 
 const getConversationById = async (req, res) => {
     try {
@@ -125,8 +125,6 @@ const getConversationById = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch conversation." });
     }
 };
-
-
 
 const addParticipantsToGroup = async (req, res) => {
     try {
@@ -184,8 +182,6 @@ const addParticipantsToGroup = async (req, res) => {
     }
 };
 
-
-
 const removeParticipantsFromGroup = async (req, res) => {
     try {
         const { conversationId } = req.params;
@@ -236,8 +232,6 @@ const removeParticipantsFromGroup = async (req, res) => {
         res.status(500).json({ message: "Failed to remove participants." });
     }
 };
-
-
 
 const updateGroupConversation = async (req, res) => {
     try {
