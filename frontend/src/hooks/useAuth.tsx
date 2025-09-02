@@ -1,4 +1,4 @@
-// CoreChat/frontend/src/hooks/useAuth.ts
+// CoreChat/frontend/src/hooks/useAuth.tsx
 
 "use client";
 
