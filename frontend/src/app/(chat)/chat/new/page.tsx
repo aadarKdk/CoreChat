@@ -4,21 +4,21 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore"; // Use the new auth store
 import { Button } from "@/components/ui/button";
 import { User } from "@/types";
 import * as userService from "@/services/userService";
 import * as conversationService from "@/services/conversationService";
-import { ArrowLeft, Loader2, UserCircle2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useChat } from "@/hooks/useChat";
+import { useChatStore } from "@/store/chatStore"; // Use the new chat store
 import { ChatSidebar } from "../components/sidebar";
 import { cn } from "@/lib/utils";
 
 export default function NewChatPage() {
-    const { currentUser, token, isLoadingAuth } = useAuth();
+    const { currentUser, token, isLoadingAuth } = useAuthStore();
     const router = useRouter();
-    const { conversations } = useChat();
+    const { conversations } = useChatStore(); // Access conversations from the Zustand store
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -41,12 +41,12 @@ export default function NewChatPage() {
     }, [token, currentUser]);
 
     const handleCreateChat = async (recipientId: string) => {
-        if (!token || !currentUser) return; // Ensure currentUser is available
+        if (!token || !currentUser) return;
 
         // Check if a conversation with this user already exists
         const existingConvo = conversations.find(convo =>
             !convo.groupAdmin &&
-            convo.participants.length === 2 && // Ensure it's a direct message
+            convo.participants.length === 2 &&
             convo.participants.some(p => p._id === recipientId) &&
             convo.participants.some(p => p._id === currentUser._id)
         );
@@ -57,21 +57,19 @@ export default function NewChatPage() {
         }
 
         try {
-            // CORRECTED: Include the 'type' property as "dm" for direct messages
             const newConvo = await conversationService.createConversation(
                 {
                     participants: [currentUser._id, recipientId],
-                    type: "dm" // Explicitly set type to 'dm'
+                    type: "dm"
                 },
                 token
             );
             router.push(`/chat?convoId=${newConvo._id}`);
-        } catch (error: any) { // Catch error as 'any' for now to access .message
+        } catch (error: any) {
             console.error("Failed to create conversation:", error.message || error);
         }
     };
 
-    // Redirect to login if not authenticated
     useEffect(() => {
         if (!isLoadingAuth && !currentUser) {
             router.push('/login');
@@ -91,7 +89,6 @@ export default function NewChatPage() {
         <div className="flex w-full min-h-screen bg-slate-800 text-white font-inter antialiased">
             <ChatSidebar />
             <div className="flex-1 flex flex-col p-6 overflow-y-auto">
-                {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
                     <Button onClick={() => router.back()} variant="ghost" size="icon" className="text-slate-400 hover:bg-slate-700 hover:text-white">
                         <ArrowLeft size={24} />
@@ -99,7 +96,6 @@ export default function NewChatPage() {
                     <h1 className="text-2xl font-semibold">Start a New Chat</h1>
                 </div>
 
-                {/* User List */}
                 <div className="space-y-4">
                     {users.length > 0 ? (
                         users.map(user => (

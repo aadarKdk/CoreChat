@@ -3,16 +3,18 @@
 "use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore"; // Import the new auth store
+import { useChatStore } from "@/store/chatStore";
 import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useChat } from '@/hooks/useChat';
 import * as messageService from '@/services/messageService';
 import { Conversation, Message } from '@/types';
 
+
 export function ChatWindow() {
-    const { currentUser, token } = useAuth();
-    const { activeConversation, messages, isLoadingChat, addMessage, setActiveConversationId } = useChat();
+    // Access state and actions from the Zustand stores
+    const { currentUser, token } = useAuthStore();
+    const { activeConversation, messages, addMessage } = useChatStore();
     const [inputMessage, setInputMessage] = React.useState<string>('');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,7 +38,7 @@ export function ChatWindow() {
             };
 
             const newMessage = await messageService.sendMessage(payload, token);
-            addMessage(newMessage); // Use the context function to add the new message
+            addMessage(newMessage); // Use the Zustand store function to add the new message
             setInputMessage('');
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -45,20 +47,15 @@ export function ChatWindow() {
 
     // Determine the chat title based on the conversation type
     const getChatTitle = (convo: Conversation, user: any) => {
-      if (convo.groupAdmin) {
-        return convo.name;
-      }
-      const otherParticipant = convo.participants.find(p => p._id !== user._id);
-      return otherParticipant?.name || "Private Chat";
+        if (convo.groupAdmin) {
+            return convo.name;
+        }
+        const otherParticipant = convo.participants.find(p => p._id !== user._id);
+        return otherParticipant?.name || "Private Chat";
     };
 
-    if (isLoadingChat || !currentUser) {
-        return (
-            <div className="flex-1 flex flex-col justify-center items-center bg-slate-800">
-                <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-                <p className="ml-3 mt-4 text-lg text-slate-400">Loading chat...</p>
-            </div>
-        );
+    if (!currentUser) {
+        return null; // A loading spinner or a message is handled by the root layout
     }
 
     if (!activeConversation) {
@@ -88,7 +85,7 @@ export function ChatWindow() {
                         <div
                             key={message._id}
                             className={cn(
-                                "flex items-end gap-2", // Changed from items-start gap-4
+                                "flex items-end gap-2",
                                 isCurrentUser ? "justify-end" : "justify-start"
                             )}
                         >

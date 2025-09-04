@@ -1,21 +1,15 @@
 // CoreChat/frontend/src/app/(chat)/chat/layout.tsx
 
 import type { PropsWithChildren } from "react";
-import { AuthProvider } from "@/hooks/useAuth";
-//import { ChatProvider } from "@/hooks/useChat"; // Import the new ChatProvider
+// No need to import AuthProvider or ChatProvider as Zustand handles state globally.
 import { ChatSidebar } from "./components/sidebar";
 import { ChatWindow } from "./components/chatWindow";
-import { ChatProvider } from "@/hooks/useChat";
 
 export default function ChatLayout({ children }: PropsWithChildren) {
+  // The global state from Zustand is now available to all child components without wrappers.
   return (
-    <AuthProvider>
-      <ChatProvider>
-        <div className="flex h-screen w-full">
-            {children}
-        </div>
-      </ChatProvider>
-    </AuthProvider>
+    <div className="flex h-screen w-full">
+      {children}
+    </div>
   );
 }
-

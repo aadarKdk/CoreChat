@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore"; // Use the new Zustand store
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,8 +28,16 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [gender, setGender] = useState(""); // Assuming a simple string input for gender for now
-  const { register, isLoadingAuth, error, clearError } = useAuth();
+
+  const { register, isLoadingAuth, error, clearError, currentUser } = useAuthStore();
   const router = useRouter();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (currentUser) {
+      router.push('/chat');
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
     clearError();
@@ -40,12 +48,12 @@ export default function RegisterPage() {
     event.preventDefault();
     const success = await register({ name, username, email, password, gender: gender || undefined });
     if (success) {
-      // Redirection is handled inside useAuth hook
+      router.push('/login?registered=true'); // Handle redirection here
     }
   };
 
   return (
-    <div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 font-inter text-white">
       <Card className="w-[420px] bg-slate-800 border-slate-700 shadow-xl rounded-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold text-blue-400">Create an Account</CardTitle>
@@ -98,7 +106,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="password" className="text-slate-300">Password</Label>n
+                <Label htmlFor="password" className="text-slate-300">Password</Label>
                 <Input
                   id="password"
                   type="password"
