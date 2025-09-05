@@ -1,15 +1,13 @@
-// CoreChat/frontend/src/app/(chat)/chat/components/ChatLayout.tsx
-
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ChatSidebar } from "./sidebar";
+import { useAuthStore } from "@/store/authStore";
 
 export function ChatLayout({ children }: { children: React.ReactNode }) {
-    const { currentUser, isLoadingAuth } = useAuth();
+    const { currentUser, isLoadingAuth } = useAuthStore();
     const router = useRouter();
 
     // Redirect to login if not authenticated

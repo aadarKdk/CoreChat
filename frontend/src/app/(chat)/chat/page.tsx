@@ -9,6 +9,7 @@ import { ChatSidebar } from "./components/sidebar";
 import { ChatWindow } from "./components/chatWindow";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { SidebarProvider } from "@/components/ui/sidebar"; // Import the SidebarProvider
 
 export default function ChatPage() {
     const { currentUser, token, isLoadingAuth } = useAuthStore();
@@ -44,7 +45,6 @@ export default function ChatPage() {
             if (activeConversationIdFromUrl) {
                 setActiveConversationId(activeConversationIdFromUrl, conversations);
             } else if (!activeConversation) {
-                // Set the first conversation as active if no ID is in the URL
                 setActiveConversationId(conversations[0]._id, conversations);
             }
         }
@@ -57,7 +57,6 @@ export default function ChatPage() {
         }
     }, [activeConversation, token, fetchMessages]);
 
-    // Show a global loading spinner while authentication and chat data is being checked
     if (isLoadingAuth || isLoadingChat || !currentUser) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white font-inter">
@@ -68,11 +67,13 @@ export default function ChatPage() {
     }
 
     return (
-        <div className="flex w-full min-h-screen bg-slate-800 text-white font-inter antialiased">
-            <ChatSidebar />
-            <div className="flex-1 flex flex-col">
-                <ChatWindow />
+        <SidebarProvider> {/* Add the SidebarProvider here */}
+            <div className="flex w-full min-h-screen bg-slate-800 text-white font-inter antialiased">
+                <ChatSidebar />
+                <div className="flex-1 flex flex-col">
+                    <ChatWindow />
+                </div>
             </div>
-        </div>
+        </SidebarProvider>
     );
 }
